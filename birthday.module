@@ -1,0 +1,82 @@
+<?php
+
+/**
+* @file
+* Archivo para empezar a programar con Drupal
+*/
+/**
+* Implementa hook_menu().
+*/
+ 
+function birthday_menu() {
+	
+ $items['birthday'] = array(
+	'title' => 'Módulo cumpleañero',
+	'page callback' => 'birthday',
+	'access callback' => TRUE,
+ );
+ 
+ $items['admin/config/content/fecha'] = array(
+	'title' => 'Fecha de nacimiento',
+	'description' => 'Configurar las opciones acerca de la fecha de nacimiento.',
+	'page callback' => 'drupal_get_form',
+	'page arguments' => array('birthday_configuracion'),
+	'access arguments' => array('administer site configuration'),
+	'file' => 'birthday.admin.inc',
+ );
+ 
+ return $items;
+ 
+}
+
+
+/**
+* Implementa hook_user_login().
+*/
+
+function birthday_user_login(&$edit, $account) {
+	
+	 drupal_set_message("Bienvenido a nuestra página web" . $account->name);
+	 
+}
+
+
+function birthday(){
+	
+	date_default_timezone_set("Europe/Paris");
+	$fecha_actual = date("Y/m/d");
+	$birthday = variable_get('fecha_cumpleanos');
+	$birthday = date('Y').'/'.$birthday['month'].'/'.$birthday['day'];
+	
+
+		$dias = dias_restantes($fecha_actual, $birthday);
+	
+		if($dias == 0) //Si los días restantes son iguales a 0, es su cumpleaños
+			$variables = array('message' => '¡Feliz cumpleaños!!!');
+		else{
+		
+			if($dias < 0)   //Si su cumpleaños ya ha pasado..
+				$dias = $dias + 365;
+		
+			$variables = array('message' => 'Hoy no es tu cumpleaños. Aún quedan '.$dias.' días para su cumpleaños. ');	
+		}
+ 
+	return theme('birthday', $variables);
+	
+}
+
+function dias_restantes($fecha_actual, $birthday) {
+	
+		$diferencia = strtotime($birthday) - strtotime($fecha_actual);
+		$dias = $diferencia	/ 60 /60 /24;
+ 
+		return $dias;
+		
+}
+
+function birthday_theme(){
+	
+	return array('birthday' => array('template' => 'birthday'));
+	
+}
+?>

@@ -1,0 +1,5 @@
+name = Birthday 
+description = "Módulo para felicitar cumpleanos"
+package = Aprendiendo a programar en Drupal
+core = 7.x
+
